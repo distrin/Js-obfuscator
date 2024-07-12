@@ -1,0 +1,17 @@
+{
+  "name": "js-obfuscator",
+  "version": "1.0.0",
+  "description": "Bem-vindo ao repositório do **JavaScript Obfuscator**. Este projeto foi desenvolvido para ajudar a proteger seu código JavaScript, tornando-o mais seguro e difícil de entender.",
+  "main": "jsbuild.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node jsbuild.js",
+    "build": "javascript-obfuscator src/ --output dist/"
+  },
+  "keywords": ["javascript", "obfuscator", "security"],
+  "author": "Murizada",
+  "license": "ISC",
+  "dependencies": {
+    "javascript-obfuscator": "^4.1.1"
+  }
+}
