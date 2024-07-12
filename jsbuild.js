@@ -1,9 +1,7 @@
-// me de os créditos por favor h4x <3
-
 const JavaScriptObfuscator = require('javascript-obfuscator');
 const fs = require('fs');
 const path = require('path');
-const inquirer = require('inquirer');
+const readline = require('readline');
 
 const targetFolder = './build';
 
@@ -14,40 +12,40 @@ if (!fs.existsSync(targetFolder)) {
 const obfuscationOptions = {
   compact: true,
   controlFlowFlattening: true,
-  controlFlowFlatteningThreshold: 1.0,
+  controlFlowFlatteningThreshold: 0.75,
   deadCodeInjection: true,
-  deadCodeInjectionThreshold: 1.0,
+  deadCodeInjectionThreshold: 0.4,
   debugProtection: true,
-  debugProtectionInterval: 4000,
-  disableConsoleOutput: true,
+  debugProtectionInterval: 2000,
+  disableConsoleOutput: false,
   identifierNamesGenerator: 'mangled',
   log: false,
   renameGlobals: true,
   selfDefending: true,
   splitStrings: true,
-  splitStringsChunkLength: 3,
+  splitStringsChunkLength: 5,
   stringArray: true,
-  stringArrayEncoding: ['rc4', 'base64'],
-  stringArrayThreshold: 1.0,
+  stringArrayEncoding: ['base64'],
+  stringArrayThreshold: 0.75,
   transformObjectKeys: true,
   unicodeEscapeSequence: true,
   numbersToExpressions: true,
   simplify: true,
   stringArrayRotate: true,
   stringArrayShuffle: true,
-  stringArrayWrappersCount: 5,
+  stringArrayWrappersCount: 2,
   stringArrayWrappersChainedCalls: true,
   stringArrayWrappersType: 'function',
-  stringArrayWrappersParametersMaxCount: 5,
-  stringArrayWrappersParametersMinCount: 2,
-  forceTransformStrings: ['hexadecimal', 'base64'],
+  stringArrayWrappersParametersMaxCount: 3,
+  stringArrayWrappersParametersMinCount: 1,
+  forceTransformStrings: ['base64'],
   rotateStringArray: true,
   shuffleStringArray: true,
   splitStrings: true,
-  splitStringsChunkLength: 3,
+  splitStringsChunkLength: 5,
   stringArray: true,
-  stringArrayEncoding: ['rc4', 'base64'],
-  stringArrayThreshold: 1.0,
+  stringArrayEncoding: ['base64'],
+  stringArrayThreshold: 0.75,
   transformObjectKeys: true,
   unicodeEscapeSequence: true
 };
@@ -59,7 +57,7 @@ const obfuscateFile = async (filePath, targetFile, options) => {
 
     let obfuscated = JavaScriptObfuscator.obfuscate(fileContent, options).getObfuscatedCode();
 
-    const secondaryOptions = { ...options, controlFlowFlatteningThreshold: 0.5, deadCodeInjectionThreshold: 0.5 };
+    const secondaryOptions = { ...options, controlFlowFlatteningThreshold: 0.5, deadCodeInjectionThreshold: 0.3 };
     obfuscated = JavaScriptObfuscator.obfuscate(obfuscated, secondaryOptions).getObfuscatedCode();
 
     fs.writeFileSync(targetFile, obfuscated, { encoding: 'utf-8' });
@@ -70,24 +68,20 @@ const obfuscateFile = async (filePath, targetFile, options) => {
 };
 
 const main = async () => {
-  const answers = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'filePath',
-      message: 'Arraste e solte o arquivo .js que você quer ofuscar:',
-      validate: function (input) {
-        if (fs.existsSync(input) && path.extname(input) === '.js') {
-          return true;
-        }
-        return 'Por favor, forneça um caminho válido para um arquivo .js';
-      }
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('Arraste e solte o arquivo .js que você quer ofuscar: ', async (filePath) => {
+    if (fs.existsSync(filePath) && path.extname(filePath) === '.js') {
+      const targetFile = path.join(targetFolder, path.basename(filePath));
+      await obfuscateFile(filePath, targetFile, obfuscationOptions);
+    } else {
+      console.log('Por favor, forneça um caminho válido para um arquivo .js');
     }
-  ]);
-
-  const filePath = answers.filePath;
-  const targetFile = path.join(targetFolder, path.basename(filePath));
-
-  await obfuscateFile(filePath, targetFile, obfuscationOptions);
+    rl.close();
+  });
 };
 
-main();
+main().catch(error => console.error(`\x1b[31mErro na execução do script:\x1b[0m`, error));
